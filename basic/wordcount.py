@@ -39,12 +39,13 @@ print_words() and print_top().
 import sys
 
 # +++your code here+++
-def print_words(filename):
+# define helper fn to build word/count dict for DRY code
+def wordcount_dict(filename):
   word_count = {}
   txt_file = open(filename, 'r')
   # entire file saved as a giant txt_string
   txt_string = txt_file.read()
-  # split into words
+  # split string into a list of words
   words = txt_string.split()
   # store in lowercase for sorting
   for word in words:
@@ -55,6 +56,27 @@ def print_words(filename):
       word_count[word] = word_count[word] + 1
   txt_file.close()
   return word_count
+
+# sort dictionary by word
+def print_words(filename):
+  word_count = wordcount_dict(filename)
+  sorted_words = sorted(word_count.keys())
+  for word in sorted_words:
+    print word, word_count[word]
+
+# define custom function to sort tuple by value
+def get_count(tuple):
+  return tuple[1]
+
+# sort dictionary by count and print top 20 (reverse sort)
+def print_top(filename):
+  word_count = wordcount_dict(filename)
+  # .items() turns dictionary into a list of (key, value) tuples
+  sort_tuples = sorted(word_count.items(), key=get_count, reverse=True)
+  # Print first 20 via list slicing
+  sort_tuples = sort_tuples[:20]
+  for k,v, in sort_tuples: print k, v 
+
 
 # This basic command line argument parsing code is provided and
 # calls the print_words() and print_top() functions which you must define.
