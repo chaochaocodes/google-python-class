@@ -18,7 +18,33 @@ import commands
 # +++your code here+++
 # Write functions and modify main() to call them
 
+# Part A. Manipulating file paths
+# returns a list of the absolute paths of the special files in the given directory
+def get_special_paths(dir):
+  result = []
+  filenames = os.listdir(dir)
+  # print filenames ## ['zz__something__.jpg', 'copyspecial.py', ...]
+  for filename in filenames:
+    # print os.path.join(dir, filename)  ## ./zz__something__.jpg (joins dir+filename in pathform valid path form)
+    # print os.path.abspath(path) ## complete path
 
+    # extra filenames with the pattern __w__
+    special_file = re.search(r'__(\w+)__', filename)
+    if special_file:
+      result.append(os.path.abspath(filename))
+
+  for path in result:
+    print path
+
+# Part B. File copying
+# given a list of paths, copies those files into the given directory
+def copy_to(paths, dir):
+  
+  return
+
+# Part C. Calling an external program
+# given a list of paths, zip those files up into the given zipfile
+# def zip_to(paths, zippath):
 
 def main():
   # This basic command line argument parsing code is provided.
@@ -50,6 +76,10 @@ def main():
 
   # +++your code here+++
   # Call your functions
+  for dir in args:
+    paths = get_special_paths(dir)
+
+
   
 if __name__ == "__main__":
   main()
