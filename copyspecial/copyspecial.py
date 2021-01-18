@@ -20,27 +20,31 @@ import commands
 
 # Part A. Manipulating file paths
 # returns a list of the absolute paths of the special files in the given directory
-def get_special_paths(dir):
+def get_special_paths(dirname):
   result = []
-  filenames = os.listdir(dir)
+  filenames = os.listdir(dirname)
   # print filenames ## ['zz__something__.jpg', 'copyspecial.py', ...]
   for filename in filenames:
-    # print os.path.join(dir, filename)  ## ./zz__something__.jpg (joins dir+filename in pathform valid path form)
+    # path = os.path.join(dirname, filename)  ## joins dir + fname in platform-valid way)  
+    # print path    ## ./zz__something__.jpg 
     # print os.path.abspath(path) ## complete path
 
-    # extra filenames with the pattern __w__
-    special_file = re.search(r'__(\w+)__', filename)
-    if special_file:
-      result.append(os.path.abspath(filename))
-
-  for path in result:
-    print path
+    # extract filenames with the pattern __w__
+    match = re.search(r'__(\w+)__', filename)
+    if match:
+      result.append(os.path.abspath(os.path.join(dirname, filename)))
+  return result
 
 # Part B. File copying
 # given a list of paths, copies those files into the given directory
-def copy_to(paths, dir):
-  
-  return
+# copies special files into given dir, create that dir if doesn't exist
+def copy_to(paths, todir):
+  if not os.path.exists(todir):
+    os.mkdir(todir)
+  for path in paths:
+    filename = os.path.basename(path)
+    shutil.copy(path, os.path.join(todir, filename))
+
 
 # Part C. Calling an external program
 # given a list of paths, zip those files up into the given zipfile
@@ -76,10 +80,15 @@ def main():
 
   # +++your code here+++
   # Call your functions
-  for dir in args:
-    paths = get_special_paths(dir)
-
-
+  paths = []
+  for dirname in args:
+    paths.extend(get_special_paths(dirname))
   
+  if todir: 
+    copy_to(paths, todir)
+  else: 
+    print '\n'.join(paths)
+  
+
 if __name__ == "__main__":
   main()
