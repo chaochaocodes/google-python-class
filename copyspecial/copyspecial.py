@@ -11,6 +11,8 @@ import re
 import os
 import shutil
 import commands
+import zipfile
+import datetime
 
 """Copy Special exercise
 """
@@ -36,8 +38,9 @@ def get_special_paths(dirname):
   return result
 
 # Part B. File copying
-# given a list of paths, copies those files into the given directory
-# copies special files into given dir, create that dir if doesn't exist
+# Given a list of paths, copies those files into the given directory
+# Copy special files into given dir, create that dir if it doesn't exist
+# Usage: ./copyspecial.py --todir /tmp/mon .
 def copy_to(paths, todir):
   if not os.path.exists(todir):
     os.mkdir(todir)
@@ -47,8 +50,49 @@ def copy_to(paths, todir):
 
 
 # Part C. Calling an external program
-# given a list of paths, zip those files up into the given zipfile
-# def zip_to(paths, zippath):
+# Given a list of paths, zip those files up into the given zipfile
+# Find all special files, invoke zip utility to zip it all up into the zip file
+def zip_to(paths, zippath):
+# zip file using ZIP command in Linux, syntax: zip [options] zipfile files_list
+  cmd = 'zip ' + zippath + ' ' + ' '.join(paths)
+  print "I'm about to:", cmd
+  (status, output) = commands.getstatusoutput(cmd)
+  if status: 
+    print status
+    sys.stderr.write('there was an error:' + output)
+    sys.exit(1)
+
+  #  check zipfile
+  with zipfile.ZipFile(zippath, 'r') as zip: 
+    # printing all the contents of the zip file 
+    zip.printdir()
+    # extract and view files
+    zip.extractall() 
+
+
+# zip file using imported zipfile ---------------------------------
+  # # print list of all files to be zipped
+  # print ('Following files will be zipped:')
+  # for fname in paths:
+  #   print fname
+
+  # # write files to a zipfile
+  # with zipfile.ZipFile(zippath, 'w') as zip:
+  #   # write each file
+  #   for file in paths:
+  #     zip.write(file)
+  # print 'Successfully zipped!'
+
+  # # check zipfile info
+  # with zipfile.ZipFile(zippath, 'r') as zip:
+  #   for info in zip.infolist():
+  #     print 'info.filename: ', info.filename
+  #     print '\tModified:\t' + str(datetime.datetime(*info.date_time))
+  #     print '\tSystem:\t\t' + str(info.create_system) + '(0 = Windows, 3 = Unix)'
+  #     print '\tZIP version:\t' + str(info.create_version)
+  #     print '\tCompressed:\t' + str(info.compress_size) + ' bytes'
+  #     print '\tUncompressed:\t' + str(info.file_size) + ' bytes'
+
 
 def main():
   # This basic command line argument parsing code is provided.
@@ -83,9 +127,11 @@ def main():
   paths = []
   for dirname in args:
     paths.extend(get_special_paths(dirname))
-  
+
   if todir: 
     copy_to(paths, todir)
+  elif tozip: 
+    zip_to(paths, tozip)
   else: 
     print '\n'.join(paths)
   
