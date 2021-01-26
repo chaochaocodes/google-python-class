@@ -21,10 +21,32 @@ Here's what a puzzle url looks like:
 
 def read_urls(filename):
   """Returns a list of the puzzle urls from the given log file,
-  extracting the hostname from the filename itself.
+  extracting the hostname from the filename itself. (hostname: code.google.com)
   Screens out duplicate urls and returns the urls sorted into
   increasing order."""
-  # +++your code here+++
+  # +++your code here++
+  # Extract hostname from filename
+  hostname = re.search(r'_(\w[^_]+)', filename)
+  host = hostname.group(1)
+  # 1. Process entire log file
+  f_urls = []
+  f = open(filename)
+  # print f.read()
+  # 2. Find all puzzle image url slices, add hostname
+  for line in f:
+    url_match = re.search(r'"GET ([^ ]+)', line)
+    path = url_match.group(1)
+    if 'puzzle' in path:
+      f_urls.append('http://' + host + path)
+
+  # 3. Remove duplicates
+  urls = []
+  for i in f_urls:
+    if i not in urls:
+      urls.append(i)
+  
+  # 4. Return urls, sorted
+  return sorted(urls)
   
 
 def download_images(img_urls, dest_dir):
@@ -36,7 +58,27 @@ def download_images(img_urls, dest_dir):
   Creates the directory if necessary.
   """
   # +++your code here+++
-  
+  if not os.path.exists(dest_dir):
+    os.mkdir(dest_dir)
+
+  # Create index.html:   
+  # <html><body> <img src="img0"><img src="img1">... </body></html>
+  index = file(os.path.join(dest_dir, 'index.html'), 'w')
+  index.write('<html><body>\n')
+
+  # Download each image into directory, as img0, img1 ...
+  i = 0
+  for img_url in img_urls:
+    filename = 'img%d' % i
+    print "Retrieving...", img_url
+    urllib.urlretrieve(img_url, os.path.join(dest_dir, filename))
+
+    index.write('<img src="%s">' % (filename,))
+    i += 1
+
+  index.write('\n</body></html>\n')
+  index.close()
+
 
 def main():
   args = sys.argv[1:]
